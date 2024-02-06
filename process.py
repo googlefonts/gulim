@@ -6,7 +6,6 @@ from fontTools.ttLib.tables._g_l_y_f import Glyph
 import subprocess
 import shutil
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
-import fontTools.ttLib.tables.G_S_U_B_ as GSUB
 
 SOURCE = Path("sources/ttf")
 
@@ -19,7 +18,7 @@ for ttf in SOURCE.glob("*.ttf"):	#this identifies the GIDs for the control chara
 for ttf in SOURCE.glob("*.ttf"):
 	print ("Processing "+str(ttf).split("/")[2])
 	font = TTFont(ttf)
-	OUTPUT = str(ttf)[:-4].replace("sources/ttf","fonts/ttf")+".ttf"
+	OUTPUT = str(ttf)[:-4].replace("sources/ttf","fonts/ttf").lower()+"-regular.ttf"
 
 	for id in removeGID:
 		font["glyf"][font.getGlyphName(id)] = Glyph() #blanks the control characters in each of the fonts
@@ -70,11 +69,11 @@ subprocess.check_call(
 	[
 		"fonttools",
 		"ttLib",
-		"fonts/ttf/Gulim.ttf",
-		"fonts/ttf/GulimChe.ttf",
-		"fonts/ttf/Dotum.ttf",
-		"fonts/ttf/DotumChe.ttf",
+		"fonts/ttf/gulim-regular.ttf",
+		"fonts/ttf/gulimChe-regular.ttf",
+		"fonts/ttf/dotum-regular.ttf",
+		"fonts/ttf/dotumChe-regular.ttf",
 		"-o",
-		"fonts/ttc/gulim.ttc"
+		"fonts/ttc/gulim-regular.ttc"
 	]
 )
