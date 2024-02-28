@@ -8,6 +8,9 @@ import shutil
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 SOURCE = Path("sources/ttf")
+BUILD = Path("build").mkdir(parents=True, exist_ok=True) 
+
+# Processing the static files
 
 removeGID = []
 for ttf in SOURCE.glob("*.ttf"):	#this identifies the GIDs for the control characters in all fonts that'll be merged together
@@ -18,7 +21,7 @@ for ttf in SOURCE.glob("*.ttf"):	#this identifies the GIDs for the control chara
 for ttf in SOURCE.glob("*.ttf"):
 	print ("Processing "+str(ttf).split("/")[2])
 	font = TTFont(ttf)
-	OUTPUT = str(ttf)[:-4].replace("sources/ttf","fonts/ttf").lower()+"-regular.ttf"
+	OUTPUT = str(ttf)[:-4].replace("sources/ttf","build").lower()+"-regular.ttf"
 
 	for id in removeGID:
 		font["glyf"][font.getGlyphName(id)] = Glyph() #blanks the control characters in each of the fonts
@@ -65,15 +68,41 @@ for ttf in SOURCE.glob("*.ttf"):
 
 	shutil.move(OUTPUT+".fix",OUTPUT)
 
+# Creating TTC from static TTFs
+
 subprocess.check_call(
 	[
 		"fonttools",
 		"ttLib",
-		"fonts/ttf/gulim-regular.ttf",
-		"fonts/ttf/gulimChe-regular.ttf",
-		"fonts/ttf/dotum-regular.ttf",
-		"fonts/ttf/dotumChe-regular.ttf",
+		"build/gulim-regular.ttf",
+		"build/gulimChe-regular.ttf",
+		"build/dotum-regular.ttf",
+		"build/dotumChe-regular.ttf",
 		"-o",
 		"fonts/ttc/gulim-regular.ttc"
 	]
 )
+
+# Subsetting the static instances for individual use
+
+for ttf in BUILD.glob("*.ttf"):
+	font = TTFont(ttf)
+	cmap = font.getBestCmap()
+	
+
+# batangUFO = ufoLib2.Font.open("Gungsuh.ufo")
+
+# glyphSet = []
+# with open('batang_demo.txt') as f:
+# 	glyphSet = f.read().splitlines()
+
+# for i in range(0,len(glyphSet)):
+# 	glyphSet[i] = int(glyphSet[i],0) #ufoLib2 stores the unicode as integer rather than hex. 
+
+# subsetFont = subset_ufo(
+# 	batangUFO,
+# 	codepoints=glyphSet,
+# 	layout_handling="closure",
+# )
+
+# subsetFont.save("Batang-Regular-subset.ufo",overwrite=True)
