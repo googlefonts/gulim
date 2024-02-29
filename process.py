@@ -8,7 +8,8 @@ import shutil
 from fontTools.ttLib.tables._c_m_a_p import CmapSubtable
 
 SOURCE = Path("sources/ttf")
-BUILD = Path("build").mkdir(parents=True, exist_ok=True) 
+Path("build").mkdir(parents=True, exist_ok=True) 
+BUILD = Path("build")
 
 # Processing the static files
 
@@ -30,8 +31,8 @@ for ttf in SOURCE.glob("*.ttf"):
 
 	cmap = font.getBestCmap()
 	
-	for glyph in ["uni0001", "uni0002", "uni0003", "uni0004", "uni0005", "uni0006", "uni0007", "uni0008", "uni0009", "uni000A", "uni000B", "uni000C", "uni000E", "uni000F", "uni0010", "uni0011", "uni0012", "uni0013", "uni0014", "uni0015", "uni0016", "uni0017", "uni0018", "uni0019", "uni001A", "uni001B", "uni001C", "uni001D", "uni001E", "uni001F"]:
-		del cmap[list(cmap.keys())[list(cmap.values()).index(glyph)]]
+	# for glyph in ["uni0001", "uni0002", "uni0003", "uni0004", "uni0005", "uni0006", "uni0007", "uni0008", "uni0009", "uni000A", "uni000B", "uni000C", "uni000E", "uni000F", "uni0010", "uni0011", "uni0012", "uni0013", "uni0014", "uni0015", "uni0016", "uni0017", "uni0018", "uni0019", "uni001A", "uni001B", "uni001C", "uni001D", "uni001E", "uni001F"]:
+	# 	del cmap[list(cmap.keys())[list(cmap.values()).index(glyph)]]
 
 	cmap4_3_1 = CmapSubtable.newSubtable(4) #creating a new cmap table to replace the existing and remove the unwanted control characters
 	cmap4_3_1.platformID = 3
@@ -70,39 +71,49 @@ for ttf in SOURCE.glob("*.ttf"):
 
 # Creating TTC from static TTFs
 
-subprocess.check_call(
-	[
-		"fonttools",
-		"ttLib",
-		"build/gulim-regular.ttf",
-		"build/gulimChe-regular.ttf",
-		"build/dotum-regular.ttf",
-		"build/dotumChe-regular.ttf",
-		"-o",
-		"fonts/ttc/gulim-regular.ttc"
-	]
-)
+# subprocess.check_call(
+# 	[
+# 		"fonttools",
+# 		"ttLib",
+# 		"build/gulim-regular.ttf",
+# 		"build/gulimChe-regular.ttf",
+# 		"build/dotum-regular.ttf",
+# 		"build/dotumChe-regular.ttf",
+# 		"-o",
+# 		"fonts/ttc/gulim-regular.ttc"
+# 	]
+# )
 
 # Subsetting the static instances for individual use
 
-for ttf in BUILD.glob("*.ttf"):
+for ttf in BUILD.glob("*regular.ttf"):
 	font = TTFont(ttf)
-	cmap = font.getBestCmap()
+	font["post"].formatType = 2
+	font["post"].build_psNameMapping()
+	font.save(str(ttf)+".fix")
+
+
+for ttf in BUILD.glob("*regular.ttf"):
+
+	font = TTFont(ttf)
+	cmapDict = font.getBestCmap()
+
+	unicodes = []
+	for entry in list(cmapDict.keys()):
+		unicodes.append(hex(entry))
+
+	unicodelist = str(unicodes)[1:-1].replace("', '",",")
+
+	with open('build/glyphlist.txt', 'w') as f:
+		for item in unicodes:
+			f.write(item+",")
+
+	subprocess.check_call(
+	[
+		"pyftsubset",
+		ttf,
+		"--unicodes-file=build/glyphlist.txt",
+		"--glyph-names"
+	]
+	)
 	
-
-# batangUFO = ufoLib2.Font.open("Gungsuh.ufo")
-
-# glyphSet = []
-# with open('batang_demo.txt') as f:
-# 	glyphSet = f.read().splitlines()
-
-# for i in range(0,len(glyphSet)):
-# 	glyphSet[i] = int(glyphSet[i],0) #ufoLib2 stores the unicode as integer rather than hex. 
-
-# subsetFont = subset_ufo(
-# 	batangUFO,
-# 	codepoints=glyphSet,
-# 	layout_handling="closure",
-# )
-
-# subsetFont.save("Batang-Regular-subset.ufo",overwrite=True)
