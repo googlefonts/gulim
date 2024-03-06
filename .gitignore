@@ -1,3 +1,4 @@
 venv
 build
 .DS_Store
+build.stamp
