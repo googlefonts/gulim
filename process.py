@@ -30,7 +30,7 @@ def prepareStatic():
 	for ttf in SOURCE.glob("*.ttf"):
 		print ("Processing "+str(ttf).split("/")[2])
 		font = TTFont(ttf)
-		OUTPUT = str(ttf)[:-4].replace("sources/ttf","build").lower()+"-regular.ttf"
+		OUTPUT = str(ttf)[:-4].replace("sources/ttf","build").lower()+"-Regular.ttf"
 
 		for id in removeGID:
 			font["glyf"][font.getGlyphName(id)] = Glyph() #blanks the control characters in each of the fonts
@@ -80,12 +80,12 @@ def makeTTC():
 		[
 			"fonttools",
 			"ttLib",
-			"build/gulim-regular.ttf",
-			"build/gulimChe-regular.ttf",
-			"build/dotum-regular.ttf",
-			"build/dotumChe-regular.ttf",
+			"build/gulim-Regular.ttf",
+			"build/gulimChe-Regular.ttf",
+			"build/dotum-Regular.ttf",
+			"build/dotumChe-Regular.ttf",
 			"-o",
-			"fonts/ttc/gulim-regular.ttc"
+			"fonts/ttc/gulim-Regular.ttc"
 		]
 	)
 
