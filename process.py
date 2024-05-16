@@ -92,7 +92,7 @@ def makeTTC():
 # Subsetting the static instances for individual use
 def subsetStatic():
 
-	for ttf in BUILD.glob("*regular.ttf"):
+	for ttf in BUILD.glob("*Regular.ttf"):
 		fontName = str(ttf).split("/")[1]
 		font = TTFont(ttf)
 		cmapDict = font.getBestCmap()
